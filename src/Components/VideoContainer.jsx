@@ -11,16 +11,39 @@ export default function VideoContainer(){
     const[data,setData]=useState([]);
     const dispatch=useDispatch();
 
+    const[loading,setLoading]=useState(false);
+
+    
+
     useEffect(()=>{
         apiCallForVideoCards();
     },[])
 
+
+    useEffect(()=>{
+        window.addEventListener('scroll',handleScroll)
+        return(()=>window.removeEventListener('scroll',handleScroll))
+    },[loading])
+
+    const handleScroll=()=>{
+        if(window.innerHeight + document.documentElement.scrollTop!==document.documentElement.offsetHeight || loading)
+            return;
+        else{
+            alert('You are at the end of the page')
+        }
+
+        // apiCallForVideoCards()
+    }
+
     const apiCallForVideoCards=()=>{
+        setLoading(true)
         const apiURL=videoAPI();
         fetch(apiURL)
         .then((res)=>res.json())
         .then(res=>setData(res))
-        .catch(err=>alert(err));
+        .catch(err=>alert(err))
+        .finally(setLoading(false));
+
     }
     if(data.length<=0)   return <CardShimmer/>;
     else{
